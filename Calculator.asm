@@ -221,7 +221,7 @@ substract:
     mov r9, [second_temp]
 
     sub r8, 48 ; Convert the ASCII value in r8 to its numeric equivalent
-    sub r9, 48 ; Convert the ASCII value in r8 to its numeric equivalent
+    sub r9, 48 ; Convert the ASCII value in r to its numeric equivalent
 
     mov r10, r8 ; Move r8 into r10
     sub r10, r9
@@ -282,7 +282,7 @@ multiply:
     mov rax, 0
     mov rdi, 0
     mov rsi, first_temp
-    mov rsi, 2
+    mov rdx, 2
     syscall
 
     mov r8, first_temp
@@ -301,6 +301,8 @@ multiply:
 
     mov r9, second_temp
 
+    
+
     push r8
     push r9
 
@@ -314,23 +316,18 @@ multiply:
     mul r9                 ; Multiply RAX by R9 (RAX = RAX * R9)
 
     add rax, 48
-    mov result, [rax]
+    mov [result], rax
 
     pop r9
     pop r8
 
-    mov rax, 0x1 ;syscall: write
-    mov rdi, 1 ;stdout
+    mov rax, 0x1 ; syscall: write
+    mov rdi, 1 ; stdout
     lea rsi, [result]   ; Address of the result
     mov rdx, 1
     syscall
 
     jmp LOOP
-
-
-
-
-
 
 exit:
     mov rax, 60             ; Syscall: exit
