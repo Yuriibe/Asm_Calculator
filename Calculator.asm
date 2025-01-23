@@ -68,7 +68,7 @@ compare_input:
     je multiply
 
     cmp byte[rsi], '4'
-    ; je divide
+    je divide
 
     cmp byte[rsi], '5'
     je exit
@@ -301,8 +301,6 @@ multiply:
 
     mov r9, second_temp
 
-    
-
     push r8
     push r9
 
@@ -314,6 +312,68 @@ multiply:
 
     mov rax, r8            ; Load first number into RAX
     mul r9                 ; Multiply RAX by R9 (RAX = RAX * R9)
+
+    add rax, 48
+    mov [result], rax
+
+    pop r9
+    pop r8
+
+    mov rax, 0x1 ; syscall: write
+    mov rdi, 1 ; stdout
+    lea rsi, [result]   ; Address of the result
+    mov rdx, 1
+    syscall
+
+    jmp LOOP
+
+divide:
+    mov rax, 0x1
+    mov rdi, 1
+    mov rsi, first_number
+    mov rdx, first_number_length
+    syscall
+
+    mov rax, 0
+    mov rdi, 0
+    mov rsi, first_temp
+    mov rdx, 2
+    syscall
+
+    mov r8, first_temp
+
+    mov rax, 0x1
+    mov rdi, 1
+    mov rsi, second_number
+    mov rdx, second_number_length
+    syscall
+
+    mov rax, 0
+    mov rdi, 0
+    mov rsi, second_temp
+    mov rdx, 2
+    syscall
+
+    mov r9, second_temp
+
+    push r8
+    push r9
+
+    movzx r8, byte [first_temp] ; Zero-extend 1 byte from memory into r8
+    movzx r9, byte [second_temp] ; Zero-extend 1 byte from memory into r9
+
+    ; 1. `mov` copies the full source (1, 2, 4, or 8 bytes) into the destination, leaving higher
+    ;    bytes of the register unchanged if the source is smaller (e.g., 1-byte to 8-byte register).
+    ; 2. `movzx` loads only the specified source size (e.g., 1 byte) and zero-extends the rest 
+    ;    of the destination register, preventing garbage in higher bytes.
+    ; 3. Used `movzx` for r8/r9 to correctly load 1-byte values from memory, ensuring clean arithmetic.
+
+    sub r8, 48
+    sub r9, 48
+    
+    xor rdx, rdx        ; Clear RDX before division
+    mov rax, r8         ; Load first number into RAX
+    div r9              ; RAX = RAX / RCX, RDX = RAX % RCX
 
     add rax, 48
     mov [result], rax
