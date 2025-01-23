@@ -65,7 +65,7 @@ compare_input:
     je substract
 
     cmp byte[rsi], '3'
-    ; je multiply
+    je multiply
 
     cmp byte[rsi], '4'
     ; je divide
@@ -270,6 +270,62 @@ substract:
 
     jmp LOOP
 
+
+
+multiply:
+    mov rax, 0x1
+    mov rdi, 1
+    mov rsi, first_number
+    mov rdx, first_number_length
+    syscall
+
+    mov rax, 0
+    mov rdi, 0
+    mov rsi, first_temp
+    mov rsi, 2
+    syscall
+
+    mov r8, first_temp
+
+    mov rax, 0x1
+    mov rdi, 1
+    mov rsi, second_number
+    mov rdx, second_number_length
+    syscall
+
+    mov rax, 0
+    mov rdi, 0
+    mov rsi, second_temp
+    mov rdx, 2
+    syscall
+
+    mov r9, second_temp
+
+    push r8
+    push r9
+
+    mov r8, [first_temp]
+    mov r9, [second_temp]
+
+    sub r8, 48
+    sub r9, 48
+
+    mov rax, r8            ; Load first number into RAX
+    mul r9                 ; Multiply RAX by R9 (RAX = RAX * R9)
+
+    add rax, 48
+    mov result, [rax]
+
+    pop r9
+    pop r8
+
+    mov rax, 0x1 ;syscall: write
+    mov rdi, 1 ;stdout
+    lea rsi, [result]   ; Address of the result
+    mov rdx, 1
+    syscall
+
+    jmp LOOP
 
 
 
